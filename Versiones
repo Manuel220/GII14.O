@@ -1,0 +1,26 @@
+Versión actual: 1.0
+
+---Versiones---
+1.0 Commit Inicial
+La aplicación es funcional, pero tiene varios defectos de código que hay que arreglar con las versiones futuras.
+
+1.1 Creación de las clases Dispositivos, Boton y Alarma
+Se crean estas clases para corregir en futuras versiones los defectos del código.
+
+1.15 Creación de Pruebas para la versión 1.1
+Se introduciran la pruebas para monitorizar el correctos funcionamiento de las clases Dispositivos, Boton y Alarma.
+
+1.2 Adaptar la aplicación a las nuevas clases.
+Se adaptará la aplicación para que use las nuevas clases, modificando los metodos de la calse Controles: OnCreate, OnClik y OnTouch.
+
+1.3 Modificación comunicación Aplicación-Arduino
+Se adaptará el envio de mensajes a las nuevas clases.
+
+1.4 Modificación método protocoloME
+Se modificará este método para adaptar su uso con las nuevas clases.
+
+1.5 Creación dinámica de la aplicación
+En esta versión se modificará la aplicación para que la creación de los distintos controles se hagan de manera dinámica sin tener que modificar los archivos xml.
+
+1.6 Mensajes con acuse de recibo
+Se introducirá este tipo de mensajes para comprobar que el cambio de la aplicación ha sido efectivo.

@@ -11,7 +11,7 @@ Se crean estas clases para corregir en futuras versiones los defectos del códig
 Se introduciran la pruebas para monitorizar el correcto funcionamiento de las clases Dispositivos, Boton y Alarma.
 
 1.2 Adaptar la aplicación a las nuevas clases.
-Se adaptará la aplicación para que use las nuevas clases, modificando los metodos de la calse Controles: OnCreate, OnClik y OnTouch.
+Se adaptará la aplicación para que use las nuevas clases, modificando los metodos de la clase Controles: OnCreate, OnClik y OnTouch.
 
 1.3 Modificación comunicación Aplicación-Arduino
 Se adaptará el envio de mensajes a las nuevas clases.

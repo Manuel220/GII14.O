@@ -10,7 +10,15 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        testApplicationId "es.ubu.mcs0085"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
+
+    testOptions{
+        reportDir="$project.buildDir/results/report"
+        resultsDir="$project.buildDir/results"
+    }
+
     buildTypes {
         release {
             minifyEnabled false

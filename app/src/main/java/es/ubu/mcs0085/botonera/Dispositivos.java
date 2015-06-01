@@ -16,11 +16,9 @@ public class Dispositivos {
         pulsadores = new ArrayList<Boton>(pulsa);
         alarmas = new ArrayList<Alarma>(alar);
 
-        for (Boton i : interruptores) i = new Boton();
-
-        for (Boton i : pulsadores) i = new Boton();
-
-        for (Alarma i : alarmas) i = new Alarma();
+        for (int i = 0; i < inter; i++) interruptores.add(new Boton());
+        for (int i = 0; i < pulsa; i++) pulsadores.add(new Boton());
+        for (int i = 0; i < alar; i++) alarmas.add(new Alarma());
     }
 
     public List<Boton> getInterruptores() {

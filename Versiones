@@ -1,4 +1,4 @@
-Versión actual: 1.1
+Versión actual: 1.15
 
 ---Versiones---
 1.0 Commit Inicial
@@ -8,7 +8,7 @@ La aplicación es funcional, pero tiene varios defectos de código que hay que a
 Se crean estas clases para corregir en futuras versiones los defectos del código.
 
 1.15 Creación de Pruebas para la versión 1.1
-Se introduciran la pruebas para monitorizar el correctos funcionamiento de las clases Dispositivos, Boton y Alarma.
+Se introduciran la pruebas para monitorizar el correcto funcionamiento de las clases Dispositivos, Boton y Alarma.
 
 1.2 Adaptar la aplicación a las nuevas clases.
 Se adaptará la aplicación para que use las nuevas clases, modificando los metodos de la calse Controles: OnCreate, OnClik y OnTouch.

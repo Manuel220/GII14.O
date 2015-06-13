@@ -48,19 +48,19 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Guarda el número de teléfono de la placa Arduino con la que se comunica.
      */
-    private static final String NUMBER = "686600465";
+    private static final String NUMBER = "";
     /**
      * Número de interruptores.
      */
-    private static final int INTERRUPTORES=2;
+    private static final int INTERRUPTORES = 2;
     /**
      * Número de pulsadores.
      */
-    private static final int PULSADORES=2;
+    private static final int PULSADORES = 2;
     /**
      * Número de alarmas.
      */
-    private static final int ALARMAS=1;
+    private static final int ALARMAS = 1;
     /**
      * Variable que guarda las instancias de los dispositivos.
      */
@@ -78,7 +78,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * Este método se activa cuando el movil recibe SMS, MMS, llamadas telefónicas, etc...
          *
          * @param context Es el contexto del actividad.
-         * @param intent Es el objeto que recibe.
+         * @param intent  Es el objeto que recibe.
          */
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -91,7 +91,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
                 msgs = new SmsMessage[pdus.length];
                 for (int i = 0; i < msgs.length; i++) {
                     msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    message = msgs[i].getMessageBody().toString();
+                    message = msgs[i].getMessageBody();
                 }
             }
             protocoloME(message);
@@ -123,7 +123,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
                 } else {
                     boton3.setBackgroundColor(0xffd3d3d3);
                 }
-                if (message.charAt(message.length()- 5) == '1') {
+                if (message.charAt(message.length() - 5) == '1') {
                     boton4.setBackgroundColor(0xff00ff00);
                 } else {
                     boton4.setBackgroundColor(0xffd3d3d3);
@@ -143,7 +143,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
 
-        dispositivos=new Dispositivos(INTERRUPTORES,PULSADORES,ALARMAS);
+        dispositivos = new Dispositivos(INTERRUPTORES, PULSADORES, ALARMAS);
 
         dispositivos.getInterruptor(0).setButton((Button) findViewById(R.id.interruptor_a));
         dispositivos.getInterruptor(1).setButton((Button) findViewById(R.id.interruptor_b));
@@ -151,11 +151,11 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         dispositivos.getPulsador(1).setButton((Button) findViewById(R.id.pulsador_b));
         dispositivos.getAlarma(0).setAlarma((TextView) findViewById(R.id.alarma_a));
 
-        for (int i=0;i<INTERRUPTORES;i++){
+        for (int i = 0; i < INTERRUPTORES; i++) {
             dispositivos.getInterruptor(i).getButton().setOnClickListener(this);
         }
 
-        for (int i=0; i<PULSADORES;i++){
+        for (int i = 0; i < PULSADORES; i++) {
             dispositivos.getPulsador(i).getButton().setOnTouchListener(this);
         }
     }
@@ -190,19 +190,32 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     @Override
     public void onClick(View v) {
-        for (int i=0;i<INTERRUPTORES;i++){
-            if(compararId(v, i)){
+        for (int i = 0; i < INTERRUPTORES; i++) {
+            if (compararIdInterruptor(v, i)) {
                 cambioEstadoInterruptor(i);
             }
         }
     }
 
-    private boolean compararId(View v, int i) {
-        return dispositivos.getInterruptor(i).getButton().getId()==v.getId();
+    /**
+     * Compara el identificador del View con el interruptor en la posición i.
+     *
+     * @param v View que se compara.
+     * @param i Posición del interruptor que se compara.
+     * @return Devuelve si coinciden en un parámetro booleano.
+     */
+    private boolean compararIdInterruptor(View v, int i) {
+        return dispositivos.getInterruptor(i).getButton().getId() == v.getId();
     }
 
+    /**
+     * Cambia el estado del interruptor cuyo índice es introducido por parámetro y manda un SMS para comunicar el cambio de estado.
+     *
+     * @param i Índice del interruptor.
+     */
     private void cambioEstadoInterruptor(int i) {
         dispositivos.getInterruptor(i).cambioEstado();
+        mandarSMS();
     }
 
     /**
@@ -214,8 +227,8 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     @Override
     public boolean onTouch(View v, MotionEvent m) {
-        for(int i=0;i<PULSADORES;i++){
-            if(dispositivos.getPulsador(i).getButton().getId()==v.getId()){
+        for (int i = 0; i < PULSADORES; i++) {
+            if (compararIdPulsador(v, i)) {
                 if (compararIdAccionUp(m, i)) {
                     cambioEstadoPulsador(i);
                 }
@@ -227,35 +240,120 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         return true;
     }
 
+    /**
+     * Compara el identificador del View con el pulsador en la posición i.
+     *
+     * @param v View que se compara.
+     * @param i Posición del pulsador que se compara.
+     * @return Devuelve si coinciden en un parámetro booleano.
+     */
+    private boolean compararIdPulsador(View v, int i) {
+        return dispositivos.getPulsador(i).getButton().getId() == v.getId();
+    }
+
+    /**
+     * Comprueba si se presiona un pulsador y si su estado esta desactivado.
+     *
+     * @param m Evento realizado.
+     * @param i Posición del pulsador a comprobar el estado.
+     * @return Devuelve si la comprobación es positva o no en un booleano.
+     */
     private boolean compararIdAccionDown(MotionEvent m, int i) {
         return m.getAction() == MotionEvent.ACTION_DOWN && !dispositivos.getPulsador(i).getEstado();
     }
 
+    /**
+     * Comprueba si se despresiona un pulsador y si su estado esta activado.
+     *
+     * @param m Evento realizado.
+     * @param i Posición del pulsador a comprobar el estado.
+     * @return Devuelve si la comprobación es positva o no en un booleano.
+     */
     private boolean compararIdAccionUp(MotionEvent m, int i) {
         return m.getAction() == MotionEvent.ACTION_UP && dispositivos.getPulsador(i).getEstado();
     }
 
+    /**
+     * Cambia el estado del pulsador cuyo índice es introducido por parámetro y manda un SMS para comunicar el cambio de estado.
+     *
+     * @param i Índice del pulsador.
+     */
     private void cambioEstadoPulsador(int i) {
         dispositivos.getPulsador(i).cambioEstado();
+        mandarSMS();
     }
 
     /**
      * Método que se comunica con el Arduino mediante SMS.
-     *
-     * @param message Mensaje a enviar.
      */
-    private void sendSMS(String message) {
+    private void mandarSMS() {
         SmsManager sms = SmsManager.getDefault();
-        if(NUMBER!="") {
-            //sms.sendTextMessage(NUMBER, null, message, null, null);
+        String message = estadoAplicacion();
+        if (NUMBER != "") {
+            sms.sendTextMessage(NUMBER, null, message, null, null);
         }
+    }
+
+    /**
+     * Crea el mensaje a mandar al Arduino.
+     *
+     * @return Devuelve el mensaje a enviar.
+     */
+    private String estadoAplicacion() {
+        String message = "1";
+        int tamano = calculoTamanoMensaje();
+
+        for (int i = 0; i < INTERRUPTORES; i++) {
+            if (dispositivos.getInterruptor(i).getEstado()) {
+                message = "1" + message;
+            } else {
+                message = "0" + message;
+            }
+        }
+
+        for (int i = 0; i < PULSADORES; i++) {
+            if (dispositivos.getPulsador(i).getEstado()) {
+                message = "1" + message;
+            } else {
+                message = "0" + message;
+            }
+        }
+
+        for (int i = 0; i < ALARMAS; i++) {
+            if (dispositivos.getAlarma(i).getEstado()) {
+                message = "1" + message;
+            } else {
+                message = "0" + message;
+            }
+        }
+
+        for (int i = 0; i < tamano; i++) {
+            message = "0" + message;
+        }
+
+        return message;
+    }
+
+    /**
+     * Calcula el número de bits que no se utilizan, para completar el mensaje a enviar según el Protocolo ME.
+     *
+     * @return Número de bits no utilizados.
+     */
+    private int calculoTamanoMensaje() {
+        int tamanoByte = 8;
+        int tamano;
+        tamano = (dispositivos.getTamano() + 1) % tamanoByte;
+        tamano = (tamano + 1) * tamanoByte;
+        tamano = tamano - dispositivos.getTamano();
+
+        return tamano;
     }
 
     /**
      * Crea el menu de la aplicación.
      *
      * @param menu Es el menu de la pantalla Controles.
-     * @return
+     * @return Devuelve si se ha creado correctamente el menu de opciones.
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -6,8 +6,7 @@
     <string name="interruptor_b">Interruptor B</string>
     <string name="pulsador_a">Pulsador A</string>
     <string name="pulsador_b">Pulsador B</string>
-    <string name="sensor_analogico">Sensor A</string>
-    <string name="sensor_digital">Sensor D</string>
+    <string name="alarma_a">Alarma A</string>
 
     <!-- Opciones del Menu -->
     <string name="salir">Salir</string>

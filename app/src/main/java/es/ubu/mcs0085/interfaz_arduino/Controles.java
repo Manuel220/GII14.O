@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.telephony.SmsManager;
 import android.content.BroadcastReceiver;
+import android.widget.TextView;
+
+import es.ubu.mcs0085.botonera.Dispositivos;
 
 /**
  * Clase que controla la actividad principal de la Aplicación.
@@ -46,6 +49,22 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      * Guarda el número de teléfono de la placa Arduino con la que se comunica.
      */
     private static final String NUMBER = "686600465";
+    /**
+     * Número de interruptores.
+     */
+    private static final int INTERRUPTORES=2;
+    /**
+     * Número de pulsadores.
+     */
+    private static final int PULSADORES=2;
+    /**
+     * Número de alarmas.
+     */
+    private static final int ALARMAS=1;
+    /**
+     * Variable que guarda las instancias de los dispositivos.
+     */
+    private Dispositivos dispositivos;
     /**
      * Instancia de la clase que recive los SMS y atualiza la aplicación.
      */
@@ -124,17 +143,21 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
 
-        boton1 = (Button) findViewById(R.id.interruptor_a);
-        boton1.setOnClickListener(this);
+        dispositivos=new Dispositivos(INTERRUPTORES,PULSADORES,ALARMAS);
 
-        boton2 = (Button) findViewById(R.id.interruptor_b);
-        boton2.setOnClickListener(this);
+        dispositivos.getInterruptor(0).setButton((Button) findViewById(R.id.interruptor_a));
+        dispositivos.getInterruptor(1).setButton((Button) findViewById(R.id.interruptor_b));
+        dispositivos.getPulsador(0).setButton((Button) findViewById(R.id.pulsador_a));
+        dispositivos.getPulsador(1).setButton((Button) findViewById(R.id.pulsador_b));
+        dispositivos.getAlarma(0).setAlarma((TextView) findViewById(R.id.alarma_a));
 
-        boton3 = (Button) findViewById(R.id.pulsador_a);
-        boton3.setOnTouchListener(this);
+        for (int i=0;i<INTERRUPTORES;i++){
+            dispositivos.getInterruptor(i).getButton().setOnClickListener(this);
+        }
 
-        boton4 = (Button) findViewById(R.id.pulsador_b);
-        boton4.setOnTouchListener(this);
+        for (int i=0; i<PULSADORES;i++){
+            dispositivos.getPulsador(i).getButton().setOnTouchListener(this);
+        }
     }
 
     /**
@@ -163,38 +186,23 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Este método se encarga de realizar las acciones en función del interruptor que ha sido pulsado.
      *
-     * @param v Es el boton que ha sido pulsado
+     * @param v Es el botonIA que ha sido pulsado
      */
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.interruptor_a: {
-                if (uno) {
-                    boton1.setBackgroundColor(0xff00ff00);
-                    uno = false;
-                    sendSMS("InterruptorA On");
-                } else {
-                    boton1.setBackgroundColor(0xffd3d3d3);
-                    uno = true;
-                    sendSMS("InterruptorA Off");
-                }
-                break;
-            }
-            case R.id.interruptor_b: {
-                if (dos) {
-                    boton2.setBackgroundColor(0xff00ff00);
-                    dos = false;
-                    sendSMS("InterruptorB On");
-                } else {
-                    boton2.setBackgroundColor(0xffd3d3d3);
-                    dos = true;
-                    sendSMS("InterruptorB Off");
-                }
-                break;
-            }
-            default: {
+        for (int i=0;i<INTERRUPTORES;i++){
+            if(compararId(v, i)){
+                cambioEstadoInterruptor(i);
             }
         }
+    }
+
+    private boolean compararId(View v, int i) {
+        return dispositivos.getInterruptor(i).getButton().getId()==v.getId();
+    }
+
+    private void cambioEstadoInterruptor(int i) {
+        dispositivos.getInterruptor(i).cambioEstado();
     }
 
     /**
@@ -202,35 +210,33 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      *
      * @param v Contiene que pulsador es con el que se ha interactuado.
      * @param m Contiene la acción sobre el pulsador.
-     * @return
+     * @return devuelve si se han realizado correctamente la pulsación.
      */
     @Override
     public boolean onTouch(View v, MotionEvent m) {
-        switch (v.getId()) {
-            case (R.id.pulsador_a): {
-                if (m.getAction() == MotionEvent.ACTION_UP) {
-                    boton3.setBackgroundColor(0xffd3d3d3);
-                    sendSMS("PulsadorA Off");
+        for(int i=0;i<PULSADORES;i++){
+            if(dispositivos.getPulsador(i).getButton().getId()==v.getId()){
+                if (compararIdAccionUp(m, i)) {
+                    cambioEstadoPulsador(i);
                 }
-                if (m.getAction() == MotionEvent.ACTION_DOWN) {
-                    boton3.setBackgroundColor(0xff00ff00);
-                    sendSMS("PulsadorA On");
+                if (compararIdAccionDown(m, i)) {
+                    cambioEstadoPulsador(i);
                 }
-                break;
-            }
-            case R.id.pulsador_b: {
-                if (m.getAction() == MotionEvent.ACTION_UP) {
-                    boton4.setBackgroundColor(0xffd3d3d3);
-                    sendSMS("PulsadorB Off");
-                }
-                if (m.getAction() == MotionEvent.ACTION_DOWN) {
-                    boton4.setBackgroundColor(0xff00ff00);
-                    sendSMS("PulsadorB On");
-                }
-                break;
             }
         }
         return true;
+    }
+
+    private boolean compararIdAccionDown(MotionEvent m, int i) {
+        return m.getAction() == MotionEvent.ACTION_DOWN && !dispositivos.getPulsador(i).getEstado();
+    }
+
+    private boolean compararIdAccionUp(MotionEvent m, int i) {
+        return m.getAction() == MotionEvent.ACTION_UP && dispositivos.getPulsador(i).getEstado();
+    }
+
+    private void cambioEstadoPulsador(int i) {
+        dispositivos.getPulsador(i).cambioEstado();
     }
 
     /**
@@ -240,9 +246,9 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     private void sendSMS(String message) {
         SmsManager sms = SmsManager.getDefault();
-       // if(NUMBER!="") {
-            sms.sendTextMessage(NUMBER, null, message, null, null);
-       // }
+        if(NUMBER!="") {
+            //sms.sendTextMessage(NUMBER, null, message, null, null);
+        }
     }
 
     /**

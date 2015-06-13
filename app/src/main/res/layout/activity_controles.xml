@@ -32,30 +32,54 @@
     </LinearLayout>
 
     <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <Button
+        android:id="@+id/pulsador_a"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:background="#FFD3D3D3"
+        android:text="@string/pulsador_a" />
+
+
+    <Space
+        android:layout_width="10dp"
+        android:layout_height="0dp" />
+
+    <Button
+        android:id="@+id/pulsador_b"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:background="#FFD3D3D3"
+        android:text="@string/pulsador_b" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="5dp">
 
-        <Button
-            android:id="@+id/pulsador_a"
+        <TextView
+            android:id="@+id/alarma_a"
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:background="#FFD3D3D3"
-            android:text="@string/pulsador_a" />
+            android:text="@string/alarma_a"
+            android:gravity="center"
+            android:singleLine="true" />
 
 
         <Space
             android:layout_width="10dp"
             android:layout_height="0dp" />
 
-        <Button
-            android:id="@+id/pulsador_b"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:background="#FFD3D3D3"
-            android:text="@string/pulsador_b" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -40,9 +40,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void test_BitsNoUsados(){
         int tamanoByte = 8;
         int tamano;
-        tamano = (5 + 1) / tamanoByte;
+        tamano = (6) / tamanoByte;
         tamano = (tamano + 1) * tamanoByte;
-        tamano = tamano - 5-1;
+        tamano = tamano - 6;
 
         assertEquals(tamano,2);
     }

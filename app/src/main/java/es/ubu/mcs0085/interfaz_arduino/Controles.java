@@ -22,33 +22,9 @@ import es.ubu.mcs0085.botonera.Dispositivos;
  */
 public class Controles extends Activity implements View.OnClickListener, View.OnTouchListener {
     /**
-     * Estado del interruptor A.
-     */
-    private static Boolean uno = true;
-    /**
-     * Estado del interruptor B.
-     */
-    private static Boolean dos = true;
-    /**
-     * Variables del interruptor A.
-     */
-    private static Button boton1;
-    /**
-     * Variable del interruptor B.
-     */
-    private static Button boton2;
-    /**
-     * Variable del pulsador A.
-     */
-    private static Button boton3;
-    /**
-     * Variable del pulsador B.
-     */
-    private static Button boton4;
-    /**
      * Guarda el número de teléfono de la placa Arduino con la que se comunica.
      */
-    private static final String NUMBER = "617136324";
+    private static final String NUMBER = "";
     /**
      * Número de interruptores.
      */
@@ -103,33 +79,6 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @param message Mensaje de que recibe.
          */
         public void protocoloME(String message) {
-            /*if (message.charAt(message.length() - 1) == '1') {
-                if (message.charAt(message.length() - 2) == '1') {
-                    uno = false;
-                    boton1.setBackgroundColor(0xff00ff00);
-                } else {
-                    uno = true;
-                    boton1.setBackgroundColor(0xffd3d3d3);
-                }
-                if (message.charAt(message.length() - 3) == '1') {
-                    dos = false;
-                    boton2.setBackgroundColor(0xff00ff00);
-                } else {
-                    dos = true;
-                    boton2.setBackgroundColor(0xffd3d3d3);
-                }
-                if (message.charAt(message.length() - 4) == '1') {
-                    boton3.setBackgroundColor(0xff00ff00);
-                } else {
-                    boton3.setBackgroundColor(0xffd3d3d3);
-                }
-                if (message.charAt(message.length() - 5) == '1') {
-                    boton4.setBackgroundColor(0xff00ff00);
-                } else {
-                    boton4.setBackgroundColor(0xffd3d3d3);
-                }
-            }*/
-
             if(comprobarMensaje(message)){
                 for (int i = primerDispositivo(message),j=0; i > ultimoDispositivo(message); i--,j++) {
                     dispositivos.actualizarDispositivo(toBoolean(message.charAt(i)), j);

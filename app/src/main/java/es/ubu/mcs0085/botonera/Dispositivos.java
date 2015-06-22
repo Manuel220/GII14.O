@@ -28,14 +28,14 @@ public class Dispositivos {
      * Constructor de la clase.
      *
      * @param interuptores Número de interruptores.
-     * @param pulsadores Número de pulsadores.
-     * @param alarmas Número de alarmas.
+     * @param pulsadores   Número de pulsadores.
+     * @param alarmas      Número de alarmas.
      */
     public Dispositivos(int interuptores, int pulsadores, int alarmas) {
         interruptores = new ArrayList<>(interuptores);
         this.pulsadores = new ArrayList<>(pulsadores);
         this.alarmas = new ArrayList<>(alarmas);
-        tamano=interuptores+pulsadores+alarmas;
+        tamano = interuptores + pulsadores + alarmas;
 
         for (int i = 0; i < interuptores; i++) interruptores.add(new Boton());
         for (int i = 0; i < pulsadores; i++) this.pulsadores.add(new Boton());
@@ -75,7 +75,7 @@ public class Dispositivos {
      * @param i índice del interruptor.
      * @return el interruptor buscado.
      */
-    public Boton getInterruptor(int i){
+    public Boton getInterruptor(int i) {
         return interruptores.get(i);
     }
 
@@ -85,7 +85,7 @@ public class Dispositivos {
      * @param i índice del pulsador.
      * @return el pulsador buscado.
      */
-    public Boton getPulsador(int i){
+    public Boton getPulsador(int i) {
         return pulsadores.get(i);
     }
 
@@ -95,7 +95,7 @@ public class Dispositivos {
      * @param i índice de la alarma.
      * @return la alarma buscada.
      */
-    public Alarma getAlarma(int i){
+    public Alarma getAlarma(int i) {
         return alarmas.get(i);
     }
 
@@ -104,7 +104,33 @@ public class Dispositivos {
      *
      * @return número de dispositivos.
      */
-    public int getTamano(){
+    public int getTamano() {
         return tamano;
+    }
+
+    /**
+     * Actualiza los estados de los dispositivos mendiante mensajes de la placa Arduino.
+     *
+     * @param estado      Estado que debe estar el dispositivo.
+     * @param dispositivo Indice del dispositivo, el indide es completo por lo que hay que buscar
+     *                    en las distintas listas para encontar el dispositivoo concreto.
+     */
+    public void actualizarDispositivo(boolean estado, int dispositivo) {
+        int dispositivoActual = 0;
+        for (int i = 0; i < interruptores.size(); i++, dispositivoActual++) {
+            if (dispositivo == dispositivoActual && getInterruptor(i).getEstado() != estado) {
+                getInterruptor(i).cambioEstado();
+            }
+        }
+        for (int i = 0; i < pulsadores.size(); i++, dispositivoActual++) {
+            if (dispositivo == dispositivoActual && getPulsador(i).getEstado() != estado) {
+                getPulsador(i).cambioEstado();
+            }
+        }
+        for (int i = 0; i < alarmas.size(); i++, dispositivoActual++) {
+            if (dispositivo == dispositivoActual && getAlarma(i).getEstado() != estado) {
+                getAlarma(i).cambioEstado();
+            }
+        }
     }
 }

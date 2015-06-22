@@ -36,4 +36,14 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(2,dispositivos.getPulsadores().size());
         assertEquals(3,dispositivos.getAlarmas().size());
     }
+
+    public void test_BitsNoUsados(){
+        int tamanoByte = 8;
+        int tamano;
+        tamano = (5 + 1) / tamanoByte;
+        tamano = (tamano + 1) * tamanoByte;
+        tamano = tamano - 5-1;
+
+        assertEquals(tamano,2);
+    }
 }

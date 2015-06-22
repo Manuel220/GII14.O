@@ -48,7 +48,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Guarda el número de teléfono de la placa Arduino con la que se comunica.
      */
-    private static final String NUMBER = "";
+    private static final String NUMBER = "617136324";
     /**
      * Número de interruptores.
      */
@@ -64,7 +64,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Variable que guarda las instancias de los dispositivos.
      */
-    private Dispositivos dispositivos;
+    private static Dispositivos dispositivos;
     /**
      * Instancia de la clase que recive los SMS y atualiza la aplicación.
      */
@@ -73,7 +73,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Está clase se encarga de actualizar la aplicación mediante mensajes SMS que recibe.
      */
-    static public class Actualizar extends BroadcastReceiver {
+    public static class Actualizar extends BroadcastReceiver {
         /**
          * Este método se activa cuando el movil recibe SMS, MMS, llamadas telefónicas, etc...
          *
@@ -103,7 +103,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @param message Mensaje de que recibe.
          */
         public void protocoloME(String message) {
-            if (message.charAt(message.length() - 1) == '1') {
+            /*if (message.charAt(message.length() - 1) == '1') {
                 if (message.charAt(message.length() - 2) == '1') {
                     uno = false;
                     boton1.setBackgroundColor(0xff00ff00);
@@ -128,7 +128,53 @@ public class Controles extends Activity implements View.OnClickListener, View.On
                 } else {
                     boton4.setBackgroundColor(0xffd3d3d3);
                 }
+            }*/
+
+            if(comprobarMensaje(message)){
+                for (int i = primerDispositivo(message),j=0; i > ultimoDispositivo(message); i--,j++) {
+                    dispositivos.actualizarDispositivo(toBoolean(message.charAt(i)), j);
+                }
             }
+        }
+
+        /**
+         * Convierte el estado del dispositivo de char a boolean.
+         *
+         * @param estado El estado en char.
+         * @return El estado en boolean.
+         */
+        private boolean toBoolean(char estado) {
+            return estado=='1';
+        }
+
+        /**
+         * Nos da el índice del estado del último dispositivo.
+         *
+         * @param message Mensaje con los estados recibido.
+         * @return El índice del ultimo dispositivo.
+         */
+        private int ultimoDispositivo(String message) {
+            return message.length()-2-dispositivos.getTamano();
+        }
+
+        /**
+         * Nos da el índice del estado del primer dispositivo.
+         *
+         * @param message Mensaje con los estados recibido.
+         * @return El índice del primer dispositivo.
+         */
+        private int primerDispositivo(String message) {
+            return message.length()-2;
+        }
+
+        /**
+         * Comprueba si el mensaje ha recibido el formato adecuado.
+         *
+         * @param message Mensaje con los estados recibido.
+         * @return Devuelve si el mensaje es correcto.
+         */
+        private boolean comprobarMensaje(String message) {
+            return message.charAt(message.length()-1)=='1';
         }
 
     }
@@ -342,9 +388,9 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     private int calculoTamanoMensaje() {
         int tamanoByte = 8;
         int tamano;
-        tamano = (dispositivos.getTamano() + 1) % tamanoByte;
+        tamano = (dispositivos.getTamano() + 1) / tamanoByte;
         tamano = (tamano + 1) * tamanoByte;
-        tamano = tamano - dispositivos.getTamano();
+        tamano = tamano - dispositivos.getTamano()-1;
 
         return tamano;
     }

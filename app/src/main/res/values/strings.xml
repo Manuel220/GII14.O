@@ -2,11 +2,9 @@
     <string name="app_name">Interfaz-Arduino</string>
 
     <!-- Controles del Interfaz -->
-    <string name="interruptor_a">Interruptor A</string>
-    <string name="interruptor_b">Interruptor B</string>
-    <string name="pulsador_a">Pulsador A</string>
-    <string name="pulsador_b">Pulsador B</string>
-    <string name="alarma_a">Alarma A</string>
+    <string name="interruptor">Interruptor</string>
+    <string name="pulsador">Pulsador</string>
+    <string name="alarma">Alarma</string>
 
     <!-- Opciones del Menu -->
     <string name="salir">Salir</string>

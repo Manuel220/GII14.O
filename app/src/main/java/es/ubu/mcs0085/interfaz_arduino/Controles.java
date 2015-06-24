@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.telephony.SmsManager;
 import android.content.BroadcastReceiver;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import es.ubu.mcs0085.botonera.Dispositivos;
@@ -45,6 +48,10 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      * Instancia de la clase que recive los SMS y atualiza la aplicación.
      */
     private Actualizar actualizador = new Actualizar();
+    /**
+     * Variable de la interfaz que va recibiendo los botones.
+     */
+    private ViewGroup layout;
 
     /**
      * Está clase se encarga de actualizar la aplicación mediante mensajes SMS que recibe.
@@ -137,20 +144,51 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
+        generarLayout();
+        crearDispositivos();
+    }
 
+    /**
+     * Este método genera dinamicamente los interruptores, pulsadores y alarmas de la interfaz.
+     */
+    private void generarLayout() {
+        layout = (ViewGroup) findViewById(R.id.contenido);
+        for (int i = 0; i < INTERRUPTORES; i++) {
+            Button boton=new Button(this);
+            boton.setId(i);
+            boton.setText(R.string.interruptor);
+            layout.addView(boton);
+        }
+
+        for (int i = INTERRUPTORES; i < INTERRUPTORES+PULSADORES; i++) {
+            Button boton=new Button(this);
+            boton.setId(i);
+            boton.setText(R.string.pulsador);
+            layout.addView(boton);
+        }
+
+        for (int i = INTERRUPTORES+PULSADORES; i < INTERRUPTORES+PULSADORES+ALARMAS; i++) {
+            TextView alarma=new TextView(this);
+            alarma.setId(i);
+            alarma.setBackgroundColor(0xffd3d3d3);
+            alarma.setText(R.string.alarma);
+            layout.addView(alarma);
+        }
+    }
+
+    /**
+     * Este método crea los dispositivos que se van a utilizar.
+     */
+    private void crearDispositivos() {
         dispositivos = new Dispositivos(INTERRUPTORES, PULSADORES, ALARMAS);
 
-        dispositivos.getInterruptor(0).setButton((Button) findViewById(R.id.interruptor_a));
-        dispositivos.getInterruptor(1).setButton((Button) findViewById(R.id.interruptor_b));
-        dispositivos.getPulsador(0).setButton((Button) findViewById(R.id.pulsador_a));
-        dispositivos.getPulsador(1).setButton((Button) findViewById(R.id.pulsador_b));
-        dispositivos.getAlarma(0).setAlarma((TextView) findViewById(R.id.alarma_a));
-
         for (int i = 0; i < INTERRUPTORES; i++) {
+            dispositivos.getInterruptor(i).setButton((Button) findViewById(i));
             dispositivos.getInterruptor(i).getButton().setOnClickListener(this);
         }
 
-        for (int i = 0; i < PULSADORES; i++) {
+        for (int i = 0,j=INTERRUPTORES; i < PULSADORES; i++,j++) {
+            dispositivos.getPulsador(i).setButton((Button) findViewById(j));
             dispositivos.getPulsador(i).getButton().setOnTouchListener(this);
         }
     }

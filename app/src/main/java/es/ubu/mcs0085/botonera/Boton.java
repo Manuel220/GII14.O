@@ -68,6 +68,7 @@ public class Boton {
      */
     public void setButton(Button i){
         this.boton=i;
+        this.boton.setBackgroundColor(getColorOff());
     }
 
     /**

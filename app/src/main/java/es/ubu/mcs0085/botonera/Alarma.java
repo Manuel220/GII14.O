@@ -56,6 +56,7 @@ public class Alarma {
      */
     public void setAlarma(TextView i){
         this.alarma=i;
+        alarma.setBackgroundColor(getColorOff());
     }
 
     /**

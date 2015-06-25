@@ -6,7 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.view.LayoutInflater;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.telephony.SmsManager;
 import android.content.BroadcastReceiver;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import es.ubu.mcs0085.botonera.Dispositivos;
@@ -153,27 +153,65 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     private void generarLayout() {
         layout = (ViewGroup) findViewById(R.id.contenido);
+        ponerTexto("Interruptores",layout);
         for (int i = 0; i < INTERRUPTORES; i++) {
-            Button boton=new Button(this);
-            boton.setId(i);
-            boton.setText(R.string.interruptor);
-            layout.addView(boton);
+            generarDispositivo(i, R.string.interruptor);
         }
-
+        ponerTexto("Pulsadores",layout);
         for (int i = INTERRUPTORES; i < INTERRUPTORES+PULSADORES; i++) {
-            Button boton=new Button(this);
-            boton.setId(i);
-            boton.setText(R.string.pulsador);
-            layout.addView(boton);
+            generarDispositivo(i, R.string.pulsador);
         }
-
+        ponerTexto("Alarmas",layout);
         for (int i = INTERRUPTORES+PULSADORES; i < INTERRUPTORES+PULSADORES+ALARMAS; i++) {
-            TextView alarma=new TextView(this);
-            alarma.setId(i);
-            alarma.setBackgroundColor(0xffd3d3d3);
-            alarma.setText(R.string.alarma);
-            layout.addView(alarma);
+            generarDispositivo(i, R.string.alarma);
         }
+    }
+
+    /**
+     * Genera el dispositivo y lo introduce en el layout.
+     *
+     * @param i Id del dispositivo.
+     * @param texto Texto que se introduce en el dispositivo.
+     */
+    private void generarDispositivo(int i, int texto) {
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+        Button boton=new Button(this);
+        boton.setId(i);
+        boton.setText(texto);
+        boton.setWidth(width);
+        boton.setHeight(height);
+        layout.addView(boton);
+        añadirEspacio();
+    }
+
+    /**
+     * Introduce un texto entre los tipos de dispositivo.
+     *
+     * @param texto Texto a introducir.
+     * @param layout Layout donde se introduce.
+     */
+    private void ponerTexto(String texto, ViewGroup layout) {
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
+        TextView titulo=new TextView(this);
+        titulo.setWidth(width);
+        titulo.setHeight(height);
+        titulo.setText(texto);
+        titulo.setTextColor(0xffffffff);
+        titulo.setGravity(Gravity.CENTER);
+        layout.addView(titulo);
+    }
+
+    /**
+     * Este método añade un espacio entre los distintos elemento del layout.
+     */
+    private void añadirEspacio() {
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        TextView espacio=new TextView(this);
+        espacio.setWidth(width);
+        espacio.setGravity(Gravity.CENTER);
+        layout.addView(espacio);
     }
 
     /**
@@ -190,6 +228,10 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         for (int i = 0,j=INTERRUPTORES; i < PULSADORES; i++,j++) {
             dispositivos.getPulsador(i).setButton((Button) findViewById(j));
             dispositivos.getPulsador(i).getButton().setOnTouchListener(this);
+        }
+
+        for (int i=0, j=INTERRUPTORES+PULSADORES;i<ALARMAS;i++,j++){
+            dispositivos.getAlarma(i).setAlarma((TextView) findViewById(j));
         }
     }
 

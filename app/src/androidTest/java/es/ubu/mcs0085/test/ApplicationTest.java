@@ -2,10 +2,17 @@ package es.ubu.mcs0085.test;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
+import android.util.Log;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import es.ubu.mcs0085.botonera.Alarma;
 import es.ubu.mcs0085.botonera.Boton;
 import es.ubu.mcs0085.botonera.Dispositivos;
+import es.ubu.mcs0085.interfaz_arduino.R;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
@@ -43,7 +50,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         tamano = (6) / tamanoByte;
         tamano = (tamano + 1) * tamanoByte;
         tamano = tamano - 6;
-
         assertEquals(tamano,2);
+    }
+
+    public void test_LeerConfiguracion(){
+        
     }
 }

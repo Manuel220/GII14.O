@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -17,6 +19,10 @@ import android.widget.Button;
 import android.telephony.SmsManager;
 import android.content.BroadcastReceiver;
 import android.widget.TextView;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import es.ubu.mcs0085.botonera.Dispositivos;
 
@@ -31,15 +37,15 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Número de interruptores.
      */
-    private static final int INTERRUPTORES = 2;
+    private static int INTERRUPTORES;
     /**
      * Número de pulsadores.
      */
-    private static final int PULSADORES = 2;
+    private static int PULSADORES;
     /**
      * Número de alarmas.
      */
-    private static final int ALARMAS = 1;
+    private static int ALARMAS;
     /**
      * Variable que guarda las instancias de los dispositivos.
      */
@@ -86,8 +92,8 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @param message Mensaje de que recibe.
          */
         public void protocoloME(String message) {
-            if(comprobarMensaje(message)){
-                for (int i = primerDispositivo(message),j=0; i > ultimoDispositivo(message); i--,j++) {
+            if (comprobarMensaje(message)) {
+                for (int i = primerDispositivo(message), j = 0; i > ultimoDispositivo(message); i--, j++) {
                     dispositivos.actualizarDispositivo(toBoolean(message.charAt(i)), j);
                 }
             }
@@ -100,7 +106,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @return El estado en boolean.
          */
         private boolean toBoolean(char estado) {
-            return estado=='1';
+            return estado == '1';
         }
 
         /**
@@ -110,7 +116,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @return El índice del ultimo dispositivo.
          */
         private int ultimoDispositivo(String message) {
-            return message.length()-2-dispositivos.getTamano();
+            return message.length() - 2 - dispositivos.getTamano();
         }
 
         /**
@@ -120,7 +126,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @return El índice del primer dispositivo.
          */
         private int primerDispositivo(String message) {
-            return message.length()-2;
+            return message.length() - 2;
         }
 
         /**
@@ -130,7 +136,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
          * @return Devuelve si el mensaje es correcto.
          */
         private boolean comprobarMensaje(String message) {
-            return message.charAt(message.length()-1)=='1';
+            return message.charAt(message.length() - 1) == '1';
         }
 
     }
@@ -144,8 +150,55 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        iniciarVariables();
         generarLayout();
         crearDispositivos();
+    }
+
+    /**
+     * Método que inicia las variables leyendo los datos del archivo de configuración.
+     */
+    private void iniciarVariables() {
+        InputStream flujo = null;
+        BufferedReader lector;
+        try {
+            flujo = getResources().openRawResource(R.raw.configuracion);
+            lector = new BufferedReader(new InputStreamReader(flujo));
+            INTERRUPTORES = iniciarVariable(lector);
+            PULSADORES = iniciarVariable(lector);
+            ALARMAS = iniciarVariable(lector);
+        } catch (Exception ex) {
+            Log.e("IniciarVariables", "Error al leer fichero desde recurso raw");
+            INTERRUPTORES = 0;
+            PULSADORES = 0;
+            ALARMAS = 0;
+        } finally {
+            try {
+                if (flujo != null)
+                    flujo.close();
+            } catch (IOException e) {
+                Log.e("IniciarVariables", "Error al cerrar flujo de lectura.");
+            }
+        }
+    }
+
+    /**
+     * Método que lee una variable del fichero de configuración, lee dos lineas ya que el fichero
+     * de configuración contiene primero el nombre de la variable y despuús su valor.
+     *
+     * @param lector Es el buffer para leer el fichero.
+     * @return Devuelve el valor de la variable transformado a integer.
+     */
+    private int iniciarVariable(BufferedReader lector) {
+        try {
+            String texto = lector.readLine();
+            texto = lector.readLine();
+            return Integer.parseInt(texto);
+        } catch (IOException e) {
+            return 0;
+        }
+
     }
 
     /**
@@ -153,16 +206,16 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     private void generarLayout() {
         layout = (ViewGroup) findViewById(R.id.contenido);
-        ponerTexto("Interruptores",layout);
+        ponerTexto("Interruptores", layout);
         for (int i = 0; i < INTERRUPTORES; i++) {
             generarDispositivo(i, R.string.interruptor);
         }
-        ponerTexto("Pulsadores",layout);
-        for (int i = INTERRUPTORES; i < INTERRUPTORES+PULSADORES; i++) {
+        ponerTexto("Pulsadores", layout);
+        for (int i = INTERRUPTORES; i < INTERRUPTORES + PULSADORES; i++) {
             generarDispositivo(i, R.string.pulsador);
         }
-        ponerTexto("Alarmas",layout);
-        for (int i = INTERRUPTORES+PULSADORES; i < INTERRUPTORES+PULSADORES+ALARMAS; i++) {
+        ponerTexto("Alarmas", layout);
+        for (int i = INTERRUPTORES + PULSADORES; i < INTERRUPTORES + PULSADORES + ALARMAS; i++) {
             generarDispositivo(i, R.string.alarma);
         }
     }
@@ -170,13 +223,13 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Genera el dispositivo y lo introduce en el layout.
      *
-     * @param i Id del dispositivo.
+     * @param i     Id del dispositivo.
      * @param texto Texto que se introduce en el dispositivo.
      */
     private void generarDispositivo(int i, int texto) {
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
-        Button boton=new Button(this);
+        Button boton = new Button(this);
         boton.setId(i);
         boton.setText(texto);
         boton.setWidth(width);
@@ -188,13 +241,13 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Introduce un texto entre los tipos de dispositivo.
      *
-     * @param texto Texto a introducir.
+     * @param texto  Texto a introducir.
      * @param layout Layout donde se introduce.
      */
     private void ponerTexto(String texto, ViewGroup layout) {
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
-        TextView titulo=new TextView(this);
+        TextView titulo = new TextView(this);
         titulo.setWidth(width);
         titulo.setHeight(height);
         titulo.setText(texto);
@@ -208,7 +261,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      */
     private void añadirEspacio() {
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
-        TextView espacio=new TextView(this);
+        TextView espacio = new TextView(this);
         espacio.setWidth(width);
         espacio.setGravity(Gravity.CENTER);
         layout.addView(espacio);
@@ -225,12 +278,12 @@ public class Controles extends Activity implements View.OnClickListener, View.On
             dispositivos.getInterruptor(i).getButton().setOnClickListener(this);
         }
 
-        for (int i = 0,j=INTERRUPTORES; i < PULSADORES; i++,j++) {
+        for (int i = 0, j = INTERRUPTORES; i < PULSADORES; i++, j++) {
             dispositivos.getPulsador(i).setButton((Button) findViewById(j));
             dispositivos.getPulsador(i).getButton().setOnTouchListener(this);
         }
 
-        for (int i=0, j=INTERRUPTORES+PULSADORES;i<ALARMAS;i++,j++){
+        for (int i = 0, j = INTERRUPTORES + PULSADORES; i < ALARMAS; i++, j++) {
             dispositivos.getAlarma(i).setAlarma((TextView) findViewById(j));
         }
     }
@@ -419,7 +472,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         int tamano;
         tamano = (dispositivos.getTamano() + 1) / tamanoByte;
         tamano = (tamano + 1) * tamanoByte;
-        tamano = tamano - dispositivos.getTamano()-1;
+        tamano = tamano - dispositivos.getTamano() - 1;
 
         return tamano;
     }

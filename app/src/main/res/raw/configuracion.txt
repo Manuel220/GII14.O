@@ -1,3 +1,6 @@
 Interruptores
+5
 Pulsadores
+3
 Alarmas
+2

@@ -1,0 +1,4 @@
+Introducir los nombres de interruptores, pulsadores y alarmas por orden:
+Salon
+Timbre
+Temperatura Alta

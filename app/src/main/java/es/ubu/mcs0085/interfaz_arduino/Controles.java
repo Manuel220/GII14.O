@@ -1,6 +1,7 @@
 package es.ubu.mcs0085.interfaz_arduino;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import es.ubu.mcs0085.botonera.Boton;
 import es.ubu.mcs0085.botonera.Dispositivos;
 
 /**
@@ -33,7 +35,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Guarda el número de teléfono de la placa Arduino con la que se comunica.
      */
-    private static final String NUMBER = "";
+    private static String NUMBER;
     /**
      * Número de interruptores.
      */
@@ -165,11 +167,13 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         try {
             flujo = getResources().openRawResource(R.raw.configuracion);
             lector = new BufferedReader(new InputStreamReader(flujo));
+            NUMBER = String.valueOf(iniciarVariable(lector));
             INTERRUPTORES = iniciarVariable(lector);
             PULSADORES = iniciarVariable(lector);
             ALARMAS = iniciarVariable(lector);
         } catch (Exception ex) {
             Log.e("IniciarVariables", "Error al leer fichero desde recurso raw");
+            NUMBER="";
             INTERRUPTORES = 0;
             PULSADORES = 0;
             ALARMAS = 0;
@@ -208,16 +212,43 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         layout = (ViewGroup) findViewById(R.id.contenido);
         ponerTexto("Interruptores", layout);
         for (int i = 0; i < INTERRUPTORES; i++) {
-            generarDispositivo(i, R.string.interruptor);
+            generarDispositivo(i, cogerNombre(i, "Interruptor"));
         }
         ponerTexto("Pulsadores", layout);
         for (int i = INTERRUPTORES; i < INTERRUPTORES + PULSADORES; i++) {
-            generarDispositivo(i, R.string.pulsador);
+            generarDispositivo(i, cogerNombre(i,"Pulsador"));
         }
         ponerTexto("Alarmas", layout);
         for (int i = INTERRUPTORES + PULSADORES; i < INTERRUPTORES + PULSADORES + ALARMAS; i++) {
-            generarDispositivo(i, R.string.alarma);
+            generarDispositivo(i, cogerNombre(i,"Alarma"));
         }
+    }
+
+    private String cogerNombre(int N, String alternativa) {
+        InputStream flujo = null;
+        BufferedReader lector;
+        String nombre="";
+        try {
+            flujo = getResources().openRawResource(R.raw.nombres);
+            lector = new BufferedReader(new InputStreamReader(flujo));
+            for(int i=0;i<N+2;i++){
+                nombre= lector.readLine();
+            }
+        } catch (Exception ex) {
+            Log.e("CogerNombre", "Error al leer fichero desde recurso raw");
+            nombre=alternativa;
+        } finally {
+            try {
+                if (flujo != null)
+                    flujo.close();
+            } catch (IOException e) {
+                Log.e("CogerNombre", "Error al cerrar flujo de lectura.");
+            }
+        }
+        if(nombre==null){
+            nombre=alternativa;
+        }
+        return nombre;
     }
 
     /**
@@ -226,7 +257,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      * @param i     Id del dispositivo.
      * @param texto Texto que se introduce en el dispositivo.
      */
-    private void generarDispositivo(int i, int texto) {
+    private void generarDispositivo(int i, String texto) {
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
         Button boton = new Button(this);
@@ -414,11 +445,11 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     /**
      * Método que se comunica con el Arduino mediante SMS.
      */
-    private void mandarSMS() {
+    protected void mandarSMS() {
         SmsManager sms = SmsManager.getDefault();
         String message = estadoAplicacion();
         if (NUMBER != "") {
-            sms.sendTextMessage(NUMBER, null, message, null, null);
+            sms.sendTextMessage(NUMBER, null, message, /*sentPI*/null, null);
         }
     }
 

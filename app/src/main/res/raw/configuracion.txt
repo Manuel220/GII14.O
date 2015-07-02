@@ -1,6 +1,8 @@
+Número de Teléfono
+000000000
 Interruptores
-5
+1
 Pulsadores
-3
+1
 Alarmas
-2
+1

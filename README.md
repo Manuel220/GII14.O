@@ -1,4 +1,4 @@
-# GII14.O
+# GII14.O: Trabajo de Fin de Grado de Informática de la Universidd de Burgos
 <H1>Interfaz de acceso telefónico a módulo de control inalámbrico</H1>
 
 El objetivo del proyecto es el desarrollo de una aplicación para un dispositivo móvil que permita reproducir la funcionalidad de un módulo de control inalámbrico ya existente, de manera que su funcionalidad esté disponible en cualquier ubicación. 

@@ -461,11 +461,11 @@ public class Controles extends Activity implements View.OnClickListener, View.On
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
-                        correcto.setText("Mensaje enviado");
+                        correcto.setText("Estado consistente");
                         correcto.setBackgroundColor(0xff00ff00);
                         break;
                     case Activity.RESULT_CANCELED:
-                        correcto.setText("Mensaje no enviado");
+                        correcto.setText("Estado no cosistente");
                         correcto.setBackgroundColor(0xffff0000);
                         break;
                 }

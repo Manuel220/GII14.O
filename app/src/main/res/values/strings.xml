@@ -5,6 +5,7 @@
     <string name="interruptor">Interruptor</string>
     <string name="pulsador">Pulsador</string>
     <string name="alarma">Alarma</string>
+    <string name="correcto">Sin mensajes enviados</string>
 
     <!-- Opciones del Menu -->
     <string name="salir">Salir</string>

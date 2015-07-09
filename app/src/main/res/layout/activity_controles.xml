@@ -5,6 +5,15 @@
     android:orientation="vertical"
     android:padding="5dp">
 
+    <TextView
+        android:id="@+id/correcto"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="@string/correcto"
+        android:background="#ffffff"
+        android:gravity="center"
+        android:layout_gravity="center"/>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="fill_parent"

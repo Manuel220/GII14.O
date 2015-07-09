@@ -20,12 +20,12 @@ import android.widget.Button;
 import android.telephony.SmsManager;
 import android.content.BroadcastReceiver;
 import android.widget.TextView;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import es.ubu.mcs0085.botonera.Boton;
 import es.ubu.mcs0085.botonera.Dispositivos;
 
 /**
@@ -60,6 +60,10 @@ public class Controles extends Activity implements View.OnClickListener, View.On
      * Variable de la interfaz que va recibiendo los botones.
      */
     private ViewGroup layout;
+    /**
+     * Variable que guarda el TextView que despliega la información de los mensajes confirmados.
+     */
+    public TextView correcto;
 
     /**
      * Está clase se encarga de actualizar la aplicación mediante mensajes SMS que recibe.
@@ -153,6 +157,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        correcto = (TextView) findViewById(R.id.correcto);
         iniciarVariables();
         generarLayout();
         crearDispositivos();
@@ -173,7 +178,7 @@ public class Controles extends Activity implements View.OnClickListener, View.On
             ALARMAS = iniciarVariable(lector);
         } catch (Exception ex) {
             Log.e("IniciarVariables", "Error al leer fichero desde recurso raw");
-            NUMBER="";
+            NUMBER = null;
             INTERRUPTORES = 0;
             PULSADORES = 0;
             ALARMAS = 0;
@@ -216,27 +221,27 @@ public class Controles extends Activity implements View.OnClickListener, View.On
         }
         ponerTexto("Pulsadores", layout);
         for (int i = INTERRUPTORES; i < INTERRUPTORES + PULSADORES; i++) {
-            generarDispositivo(i, cogerNombre(i,"Pulsador"));
+            generarDispositivo(i, cogerNombre(i, "Pulsador"));
         }
         ponerTexto("Alarmas", layout);
         for (int i = INTERRUPTORES + PULSADORES; i < INTERRUPTORES + PULSADORES + ALARMAS; i++) {
-            generarDispositivo(i, cogerNombre(i,"Alarma"));
+            generarDispositivo(i, cogerNombre(i, "Alarma"));
         }
     }
 
     private String cogerNombre(int N, String alternativa) {
         InputStream flujo = null;
         BufferedReader lector;
-        String nombre="";
+        String nombre = "";
         try {
             flujo = getResources().openRawResource(R.raw.nombres);
             lector = new BufferedReader(new InputStreamReader(flujo));
-            for(int i=0;i<N+2;i++){
-                nombre= lector.readLine();
+            for (int i = 0; i < N + 2; i++) {
+                nombre = lector.readLine();
             }
         } catch (Exception ex) {
             Log.e("CogerNombre", "Error al leer fichero desde recurso raw");
-            nombre=alternativa;
+            nombre = alternativa;
         } finally {
             try {
                 if (flujo != null)
@@ -245,8 +250,8 @@ public class Controles extends Activity implements View.OnClickListener, View.On
                 Log.e("CogerNombre", "Error al cerrar flujo de lectura.");
             }
         }
-        if(nombre==null){
-            nombre=alternativa;
+        if (nombre == null) {
+            nombre = alternativa;
         }
         return nombre;
     }
@@ -448,8 +453,27 @@ public class Controles extends Activity implements View.OnClickListener, View.On
     protected void mandarSMS() {
         SmsManager sms = SmsManager.getDefault();
         String message = estadoAplicacion();
-        if (NUMBER != "") {
-            sms.sendTextMessage(NUMBER, null, message, /*sentPI*/null, null);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                new Intent("SMS_DELIVERED"), 0);
+
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent arg1) {
+                switch (getResultCode()) {
+                    case Activity.RESULT_OK:
+                        correcto.setText("Mensaje enviado");
+                        correcto.setBackgroundColor(0xff00ff00);
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        correcto.setText("Mensaje no enviado");
+                        correcto.setBackgroundColor(0xffff0000);
+                        break;
+                }
+            }
+        }, new IntentFilter("SMS_DELIVERED"));
+
+        if (NUMBER != null) {
+            sms.sendTextMessage(NUMBER, null, message, null, deliveredPI);
         }
     }
 
